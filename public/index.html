@@ -1,0 +1,473 @@
+<!-- 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Manager</title>
+</head>
+<body>
+    <h1>File Manager</h1>
+
+    <h2>Создать файл</h2>
+    <input type="text" id="fileName" placeholder="Имя файла" />
+    <input type="text" id="fileFolder" placeholder="Папка для файла (оставьте пустым для корня)" />
+    <button onclick="createFile()">Создать файл</button>
+
+    <h2>Создать папку</h2>
+    <input type="text" id="folderName" placeholder="Имя папки" />
+    <button onclick="createFolder()">Создать папку</button>
+
+    <button onclick="listFiles()">Показать файлы и папки</button>
+    <div id="output"></div>
+
+    <h2>Изменить имя файла/папки</h2>
+    <input type="text" id="oldName" placeholder="Старое имя" />
+    <input type="text" id="newName" placeholder="Новое имя" />
+    <input type="text" id="renameFolder" placeholder="Папка для переименования (оставьте пустым для корня)" />
+    <button onclick="rename()">Переименовать</button>
+
+    <h2>Редактировать содержимое файла</h2>
+    <input type="text" id="editFileName" placeholder="Имя файла для редактирования" />
+    <textarea id="fileContent" placeholder="Новое содержимое"></textarea>
+    <button onclick="editContent()">Сохранить изменения</button>
+
+    <script>
+        const API_URL = 'http://localhost:4000';
+
+        async function createFile() {
+            const name = document.getElementById('fileName').value;
+            const folder = document.getElementById('fileFolder').value;
+
+            try {
+                const response = await fetch(`${API_URL}/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'file', name, parent: folder })
+                });
+
+                if (response.ok) {
+                    alert('Файл создан');
+                } else {
+                    const errorMessage = await response.text();
+                    alert(`Ошибка при создании файла: ${errorMessage}`);
+                }
+            } catch (error) {
+                alert('Ошибка сети: ' + error.message);
+            } finally {
+                document.getElementById('fileName').value = '';
+                document.getElementById('fileFolder').value = '';
+            }
+        }
+
+        async function createFolder() {
+            const name = document.getElementById('folderName').value;
+
+            try {
+                const response = await fetch(`${API_URL}/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'folder', name })
+                });
+
+                if (response.ok) {
+                    alert('Папка создана');
+                } else {
+                    const errorMessage = await response.text();
+                    alert(`Ошибка при создании папки: ${errorMessage}`);
+                }
+            } catch (error) {
+                alert('Ошибка сети: ' + error.message);
+            } finally {
+                document.getElementById('folderName').value = '';
+            }
+        }
+
+        async function listFiles() {
+            try {
+                const response = await fetch(`${API_URL}/list`);
+                if (!response.ok) {
+                    throw new Error('Ошибка при получении файлов');
+                }
+                
+                const files = await response.json();
+                const outputDiv = document.getElementById('output');
+                outputDiv.innerHTML = ''; // Очистить текущий вывод
+                files.forEach(file => {
+                    outputDiv.innerHTML += <div>${file.name} (${file.type}) <button onclick="deleteFile('${file.name}')">Удалить</button></div>;
+                });
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+async function deleteFile(name) {
+            try {
+                const response = await fetch(`${API_URL}/delete`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                });
+
+                if (response.ok) {
+                    alert('Файл или папка удалены');
+                } else {
+                    const errorMessage = await response.text();
+                    alert(`Ошибка при удалении: ${errorMessage}`);
+                }
+            } catch (error) {
+                alert('Ошибка сети: ' + error.message);
+            } finally {
+                listFiles(); // Обновить список после удаления
+            }
+        }
+
+        async function rename() {
+            const oldName = document.getElementById('oldName').value;
+            const newName = document.getElementById('newName').value;
+            const folder = document.getElementById('renameFolder').value;
+
+            try {
+                const response = await fetch(`${API_URL}/rename`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ oldName, newName, parent: folder })
+                });
+
+                if (response.ok) {
+                    alert('Имя изменено');
+                } else {
+                    const errorMessage = await response.text();
+                    alert(`Ошибка при переименовании: ${errorMessage}`);
+                }
+            } catch (error) {
+                alert('Ошибка сети: ' + error.message);
+            } finally {
+                listFiles(); // Обновить список после переименования
+            }
+        }
+
+        async function editContent() {
+            const fileName = document.getElementById('editFileName').value;
+            const content = document.getElementById('fileContent').value;
+
+            try {
+                const response = await fetch(`${API_URL}/edit-content`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: fileName, content })
+                });
+
+                if (response.ok) {
+                    alert('Содержимое файла обновлено');
+                } else {
+                    const errorMessage = await response.text();
+                    alert(`Ошибка при обновлении содержимого: ${errorMessage}`);
+                }
+            } catch (error) {
+                alert('Ошибка сети: ' + error.message);
+            } finally {
+                document.getElementById('editFileName').value = ''; // Очистить поле ввода
+                document.getElementById('fileContent').value = ''; // Очистить текстовое поле
+                listFiles(); // Обновить список файлов
+            }
+        }
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Manager</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+
+      h2 {
+        margin-top: 20px;
+        color: #444;
+      }
+
+      input[type='text'],
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        font-size: 16px;
+      }
+
+      button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #218838;
+      }
+
+      #output {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      @media (max-width: 600px) {
+        h1,
+        h2 {
+          font-size: 1.5em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>File Manager</h1>
+
+    <div id="output"></div>
+    <h2>Create File</h2>
+    <input type="text" id="fileName" placeholder="File Name файла" />
+    <input
+      type="text"
+      id="fileFolder"
+      placeholder="Folder for file (leave blank for root)"
+    />
+    <button onclick="createFile()">Create File</button>
+
+    <h2>Create Folder</h2>
+    <input type="text" id="folderName" placeholder="Folder Name" />
+    <button onclick="createFolder()">Create Folder</button>
+
+    <h2>Change file/folder name</h2>
+    <input type="text" id="oldName" placeholder="Carent Name" />
+    <input type="text" id="newName" placeholder="New Name" />
+    <input
+      type="text"
+      id="renameFolder"
+      placeholder="Folder to rename (leave blank for root)"
+    />
+    <button onclick="rename()">Rename</button>
+
+    <h2>Edit file contents</h2>
+    <input type="text" id="editFileName" placeholder="File name to edit" />
+    <textarea id="fileContent" placeholder="New Content"></textarea>
+    <button onclick="editContent()">Save changes</button>
+
+    <script>
+      const API_URL = 'http://localhost:4000';
+
+      async function createFile() {
+        const name = document.getElementById('fileName').value;
+        const folder = document.getElementById('fileFolder').value;
+
+        try {
+          const response = await fetch(`${API_URL}/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'file', name, parent: folder }),
+          });
+
+          if (response.ok) {
+            alert('File created');
+            listFiles(folder);
+          } else {
+            const errorMessage = await response.text();
+            alert(`Error creating file: ${errorMessage}`);
+          }
+        } catch (error) {
+          alert('Connection error: ' + error.message);
+        } finally {
+          document.getElementById('fileName').value = '';
+          document.getElementById('fileFolder').value = '';
+        }
+      }
+
+      async function createFolder() {
+        const name = document.getElementById('folderName').value;
+
+        try {
+          const response = await fetch(`${API_URL}/create`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'folder', name }),
+          });
+
+          if (response.ok) {
+            alert('Folder created');
+            listFiles('');
+          } else {
+            const errorMessage = await response.text();
+            alert(`Error creating folder: ${errorMessage}`);
+          }
+        } catch (error) {
+          alert('Network error: ' + error.message);
+        } finally {
+          document.getElementById('folderName').value = '';
+        }
+      }
+
+      function renderItems(items, outputDiv, currentFolder = '') {
+        items.forEach((item) => {
+          const div = document.createElement('div');
+          div.style.display = 'flex';
+          div.style.gap = '50px';
+          div.style.alignItems = 'center';
+          div.style.maxWidth = 'max-content';
+          div.style.border = '1px solid black';
+          div.style.padding = '5px';
+          const fullPath = `${currentFolder ? currentFolder + '/' : ''}${
+            item.name
+          }`;
+          div.innerHTML = ` 
+      <span>${item.name} (${item.type})</span>
+      ${
+        item.type === 'folder'
+          ? `<button onclick="deleteFile('${fullPath}')">delete</button>`
+          : ` <button onclick="deleteFile('${
+              currentFolder ? currentFolder + '/' : ''
+            }${item.name}')">delete</button>`
+      }`;
+          outputDiv.appendChild(div);
+
+          if (
+            item.type === 'folder' &&
+            item.children &&
+            item.children.length > 0
+          ) {
+            const childrenDiv = document.createElement('div');
+            childrenDiv.style.marginLeft = '20px';
+            renderItems(
+              item.children,
+              childrenDiv,
+              `${currentFolder ? currentFolder + '/' : ''}${item.name}`
+            );
+            outputDiv.appendChild(childrenDiv);
+          }
+        });
+      }
+      async function listFiles(folder = '') {
+        try {
+          const response = await fetch(`${API_URL}/list?folder=${folder}`);
+          if (!response.ok) {
+            throw new Error('Error while receiving files');
+          }
+
+          const files = await response.json();
+          const outputDiv = document.getElementById('output');
+          outputDiv.innerHTML = '';
+          outputDiv.style.padding = '10px';
+
+          if (files.length === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.textContent = 'Files is empty';
+            outputDiv.appendChild(emptyMessage);
+          } else {
+            renderItems(files, outputDiv, folder);
+          }
+        } catch (error) {
+          alert(error.message);
+        }
+      }
+      async function deleteFile(name, parent) {
+        try {
+          const response = await fetch(`${API_URL}/delete`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, parent }),
+          });
+
+          if (response.ok) {
+            alert('File or folder deleted');
+          } else {
+            const errorMessage = await response.text();
+            alert(`Error while deleting: ${errorMessage}`);
+          }
+        } catch (error) {
+          alert('Connection error: ' + error.message);
+        } finally {
+          listFiles(parent);
+        }
+      }
+
+      async function rename() {
+        const oldNameInput = document.getElementById('oldName');
+        const newNameInput = document.getElementById('newName');
+        const folderInput = document.getElementById('renameFolder');
+
+        const oldName = oldNameInput.value;
+        const newName = newNameInput.value;
+        const folder = folderInput.value;
+
+        try {
+          const response = await fetch(`${API_URL}/rename`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ oldName, newName, parent: folder }),
+          });
+
+          if (response.ok) {
+            alert('Name changed');
+            oldNameInput.value = '';
+            newNameInput.value = '';
+            folderInput.value = '';
+            listFiles(folder);
+          } else {
+            const errorMessage = await response.text();
+            alert(`Error while renaming: ${errorMessage}`);
+          }
+        } catch (error) {
+          alert('Connection error: ' + error.message);
+        } finally {
+          listFiles();
+        }
+      }
+      async function editContent() {
+        const fileName = document.getElementById('editFileName').value;
+        const content = document.getElementById('fileContent').value;
+
+        try {
+          const response = await fetch(`${API_URL}/edit-content`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: fileName, content }),
+          });
+
+          if (response.ok) {
+            alert('File content updated');
+          } else {
+            const errorMessage = await response.text();
+            alert(`Error updating content: ${errorMessage}`);
+          }
+        } catch (error) {
+          alert('Connection error: ' + error.message);
+        } finally {
+          document.getElementById('editFileName').value = '';
+          document.getElementById('fileContent').value = '';
+          listFiles();
+        }
+      }
+      document.addEventListener('DOMContentLoaded', listFiles());
+    </script>
+  </body>
+</html>
